@@ -25,12 +25,17 @@ class MyApp extends StatelessWidget {
           primaryColorDark: Colors.blue.shade700,
           primaryColorLight: Colors.blue.shade300,
           backgroundColor: Colors.grey.shade50,
+          shadowColor: Colors.grey.shade300,
           scaffoldBackgroundColor: Colors.grey.shade400,
           textTheme: const TextTheme(
               headlineSmall: TextStyle(
                   color: Colors.black,
                   fontSize: 16,
-                  fontWeight: FontWeight.w500))),
+                  fontWeight: FontWeight.w500),
+              bodyMedium: TextStyle(
+                  color: Colors.black,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400))),
       home: const HomePage(),
     );
   }
