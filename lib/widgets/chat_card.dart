@@ -20,54 +20,49 @@ class _ChatCardState extends State<ChatCard> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        print('${widget.name} chat pressed');
-      },
-      child: Padding(
-        padding: const EdgeInsets.all(4.0),
-        child: Container(
-          decoration: BoxDecoration(
-              color: Theme.of(context).backgroundColor,
-              border: Border.all(
-                  color: Colors.transparent,
-                  width: 1.0,
-                  style: BorderStyle.solid),
-              borderRadius: const BorderRadius.all(Radius.circular(8.0))),
-          height: height,
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                const Padding(
-                  padding: EdgeInsets.only(right: 20),
-                  child: CircleAvatar(radius: 20),
+    return Padding(
+      padding: const EdgeInsets.all(4.0),
+      child: Container(
+        decoration: BoxDecoration(
+            color: Theme.of(context).backgroundColor,
+            border: Border.all(
+                color: Colors.transparent,
+                width: 1.0,
+                style: BorderStyle.solid),
+            borderRadius: const BorderRadius.all(Radius.circular(8.0))),
+        height: height,
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              const Padding(
+                padding: EdgeInsets.only(right: 20),
+                child: CircleAvatar(radius: 20),
+              ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    FittedBox(
+                      child: Text(widget.name,
+                          style: Theme.of(context).textTheme.headlineSmall),
+                    ),
+                    FittedBox(child: Text(widget.lastMessage))
+                  ],
                 ),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      FittedBox(
-                        child: Text(widget.name,
-                            style: Theme.of(context).textTheme.headlineSmall),
-                      ),
-                      FittedBox(child: Text(widget.lastMessage))
-                    ],
-                  ),
+              ),
+              SizedBox(
+                width: 50,
+                child: Column(
+                  children: [
+                    Text(
+                        '${widget.time.hour.toString()}:${widget.time.minute.toString()}'),
+                  ],
                 ),
-                SizedBox(
-                  width: 50,
-                  child: Column(
-                    children: [
-                      Text(
-                          '${widget.time.hour.toString()}:${widget.time.minute.toString()}'),
-                    ],
-                  ),
-                )
-              ],
-            ),
+              )
+            ],
           ),
         ),
       ),
