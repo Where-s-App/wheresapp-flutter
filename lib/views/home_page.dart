@@ -1,8 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:wheresapp/api/chat_controller.dart';
-import 'package:wheresapp/model/chat.dart';
+import 'package:wheresapp/models/chat.dart';
 import 'package:wheresapp/utils/string_extensions.dart';
+import 'package:wheresapp/views/chat.dart';
 import 'package:wheresapp/widgets/chat_card.dart';
 
 class HomePage extends StatefulWidget {
@@ -28,12 +29,22 @@ class _HomePageState extends State<HomePage> {
         return ListView.builder(
           itemCount: data.size,
           itemBuilder: ((context, index) {
-            Chat chat = Chat(data, index);
+            ChatModel chat = ChatModel(data, index);
 
-            return ChatCard(
-              name: chat.name.capitalize(),
-              lastMessage: chat.lastMessage,
-              time: chat.time,
+            return GestureDetector(
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => Chat(
+                              name: chat.name.capitalize(),
+                            )));
+              },
+              child: ChatCard(
+                name: chat.name.capitalize(),
+                lastMessage: chat.lastMessage,
+                time: chat.time,
+              ),
             );
           }),
         );
@@ -53,6 +64,7 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       drawer: Drawer(),
       appBar: AppBar(
+        centerTitle: false,
         title: expandedSearchBar ? null : const Text("Where's App"),
         actions: expandedSearchBar
             ? [
