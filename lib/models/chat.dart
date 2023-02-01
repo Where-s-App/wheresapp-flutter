@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class Chat {
-  Chat(QuerySnapshot<Object?> snapshot, int index) {
+class ChatModel {
+  ChatModel(QuerySnapshot<Object?> snapshot, int index) {
     _document = snapshot.docs[index];
   }
 
