@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:wheresapp/api/chat_controller.dart';
-import 'package:wheresapp/models/chat.dart';
+import 'package:wheresapp/models/chat_model.dart';
 import 'package:wheresapp/utils/string_extensions.dart';
 import 'package:wheresapp/views/chat.dart';
 import 'package:wheresapp/widgets/chat_card.dart';
@@ -17,7 +17,7 @@ class _HomePageState extends State<HomePage> {
   bool expandedSearchBar = false;
   Widget _buildChats() {
     return StreamBuilder<QuerySnapshot>(
-      stream: ChatController.getChats('root'),
+      stream: ChatController.getChats('luis'),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError) {
           return const Text('Something went wrong');
@@ -33,12 +33,8 @@ class _HomePageState extends State<HomePage> {
 
             return GestureDetector(
               onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => Chat(
-                              name: chat.name.capitalize(),
-                            )));
+                Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => Chat(chat: chat)));
               },
               child: ChatCard(
                 name: chat.name.capitalize(),
