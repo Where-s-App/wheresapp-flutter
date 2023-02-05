@@ -49,7 +49,9 @@ class _ChatCardState extends State<ChatCard> {
                       child: Text(widget.name,
                           style: Theme.of(context).textTheme.headlineSmall),
                     ),
-                    FittedBox(child: Text(widget.lastMessage))
+                    Text(widget.lastMessage.length > 50
+                        ? '${widget.lastMessage.substring(0, 40)}...'
+                        : widget.lastMessage)
                   ],
                 ),
               ),
