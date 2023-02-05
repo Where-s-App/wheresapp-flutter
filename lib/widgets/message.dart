@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 enum MessageType {
-  sender,
-  receiver,
+  fromAuthor,
+  fromCorrespondent,
 }
 
 class Message extends StatefulWidget {
@@ -21,15 +21,15 @@ class _MessageState extends State<Message> {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Align(
-        alignment: widget.type == MessageType.sender
+        alignment: widget.type == MessageType.fromAuthor
             ? Alignment.topRight
             : Alignment.topLeft,
         child: Container(
           decoration: BoxDecoration(
-              color: widget.type == MessageType.sender
-                  ? Theme.of(context).primaryColorLight
+              color: widget.type == MessageType.fromAuthor
+                  ? Theme.of(context).cardColor
                   : Theme.of(context).backgroundColor,
-              borderRadius: widget.type == MessageType.sender
+              borderRadius: widget.type == MessageType.fromAuthor
                   ? const BorderRadius.only(
                       bottomRight: Radius.circular(8),
                       bottomLeft: Radius.circular(8),
@@ -42,6 +42,7 @@ class _MessageState extends State<Message> {
           child: Text(
             widget.message,
             style: Theme.of(context).textTheme.bodyMedium,
+            softWrap: true,
           ),
         ),
       ),
