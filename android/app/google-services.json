@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "573834799227",
+    "project_id": "where-s-app-6e4f5",
+    "storage_bucket": "where-s-app-6e4f5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:573834799227:android:9b11aefbf3d234782bdade",
+        "android_client_info": {
+          "package_name": "com.example.wheresapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "573834799227-67ameo3k2n2fjrati12dsfopa6t2009t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCAO0aJcC1czr747Q7bQZGMG3FIF1jQaaU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "573834799227-67ameo3k2n2fjrati12dsfopa6t2009t.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "573834799227-p77vns37vdv7i7usm9ojtbqc809ccf3q.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.wheresapp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
