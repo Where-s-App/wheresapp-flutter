@@ -12,6 +12,19 @@ class ChatController {
     return chats;
   }
 
+  static Future<Map<String, dynamic>?> getChatWithId(String chatId) async {
+    final chatReference =
+        FirebaseFirestore.instance.collection('chats').doc(chatId);
+
+    Map<String, dynamic>? chatData;
+
+    await chatReference.get().then((chat) {
+      chatData = chat.data();
+    });
+
+    return chatData;
+  }
+
   static Future<void> sendMessage(
       String chatId, String username, String message) {
     final chat = FirebaseFirestore.instance.collection('chats').doc(chatId);
@@ -19,9 +32,9 @@ class ChatController {
     return chat.update({
       'messages': FieldValue.arrayUnion([
         {
-          'user': username,
+          'author': username,
           'value': message,
-          'createdAt': DateTime.now(),
+          'time': DateTime.now(),
         }
       ])
     });
