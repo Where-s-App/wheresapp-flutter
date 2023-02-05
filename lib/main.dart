@@ -24,6 +24,7 @@ class MyApp extends StatelessWidget {
           primaryColor: Colors.blue,
           primaryColorDark: Colors.blue.shade700,
           primaryColorLight: Colors.blue.shade300,
+          cardColor: Colors.blue.shade100,
           backgroundColor: Colors.grey.shade50,
           shadowColor: Colors.grey.shade300,
           scaffoldBackgroundColor: Colors.grey.shade400,
