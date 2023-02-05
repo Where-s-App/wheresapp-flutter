@@ -58,7 +58,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      drawer: Drawer(),
+      drawer: const Drawer(),
       appBar: AppBar(
         centerTitle: false,
         title: expandedSearchBar ? null : const Text("Where's App"),
@@ -72,7 +72,7 @@ class _HomePageState extends State<HomePage> {
               ]
             : [
                 IconButton(
-                    onPressed: _expandSearchBar, icon: Icon(Icons.search))
+                    onPressed: _expandSearchBar, icon: const Icon(Icons.search))
               ],
       ),
       body: Padding(
