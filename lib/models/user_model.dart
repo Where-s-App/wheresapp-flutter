@@ -1,11 +1,11 @@
-class User {
+class UserModel {
   final String name;
 
-  const User({
+  const UserModel({
     required this.name,
   });
 
-  static User fromJson(Map<String, dynamic> json) => User(
+  static UserModel fromJson(Map<String, dynamic> json) => UserModel(
         name: json['name'],
       );
 
