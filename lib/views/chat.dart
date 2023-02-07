@@ -24,6 +24,17 @@ class _ChatState extends State<Chat> {
   final TextEditingController _messageEditorController =
       TextEditingController(text: '');
 
+  late ScrollController _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      _scrollController.animateTo(_scrollController.position.maxScrollExtent, duration: Duration(microseconds:  1), curve: Curves.ease);
+    });
+  }
+
   _updateChat() async {
     Map<String, dynamic>? chatData;
 
@@ -46,11 +57,8 @@ class _ChatState extends State<Chat> {
   @override
   Widget build(BuildContext context) {
     return Material(
-      child: Container(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        child: Column(
-          children: [
-            AppBar(
+      child: Scaffold(
+            appBar: AppBar(
               iconTheme:
                   IconThemeData(color: Theme.of(context).primaryColorDark),
               title: Text(
@@ -61,53 +69,68 @@ class _ChatState extends State<Chat> {
               centerTitle: false,
               backgroundColor: Theme.of(context).backgroundColor,
             ),
-            Expanded(
-              child: ListView.builder(
-                itemCount: widget.messages.length,
-                itemBuilder: (context, index) {
-                  MessageModel message = widget.messages[index];
-                  return Message(message: message.value, type: message.type);
-                },
-              ),
-            ),
-            Container(
-              height: 70,
-              color: Theme.of(context).shadowColor,
-              child: Form(
-                key: _messageEditorKey,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: TextFormField(
-                          controller: _messageEditorController,
-                          decoration: InputDecoration(
-                              labelText: 'Message',
-                              floatingLabelBehavior:
-                                  FloatingLabelBehavior.never,
-                              filled: true,
-                              fillColor: Theme.of(context).cardColor,
-                              border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                  borderSide: BorderSide.none)),
+            body: SizedBox(
+              height: MediaQuery.of(context).size.height,
+              child: Column(
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      controller: _scrollController,
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        scrollDirection: Axis.vertical,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: widget.messages.length,
+                        itemBuilder: (context, index) {
+                          MessageModel message = widget.messages[index];
+                          return Message(message: message.value, type: message.type);
+                        },
+                      ),
+                    ),
+                  ),
+                  Container(
+                    height: 70,
+                    color: Theme.of(context).shadowColor,
+                    child: Form(
+                      key: _messageEditorKey,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: TextFormField(
+                                controller: _messageEditorController,
+                                decoration: InputDecoration(
+                                    labelText: 'Message',
+                                    floatingLabelBehavior:
+                                    FloatingLabelBehavior.never,
+                                    filled: true,
+                                    fillColor: Theme.of(context).cardColor,
+                                    border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                        borderSide: BorderSide.none)),
+                              ),
+                            ),
+                            IconButton(
+                                onPressed: () {
+                                  if (_messageEditorController.text != ''){
+                                    ChatController.sendMessage(widget.chat.id, 'luis',
+                                        _messageEditorController.text)
+                                        .whenComplete(() {
+                                    _updateChat();
+                                        });
+                                  }
+                                  },
+                                icon: const Icon(Icons.send))
+                          ],
                         ),
                       ),
-                      IconButton(
-                          onPressed: () {
-                            ChatController.sendMessage(widget.chat.id, 'luis',
-                                    _messageEditorController.text)
-                                .whenComplete(() => _updateChat());
-                          },
-                          icon: const Icon(Icons.send))
-                    ],
-                  ),
-                ),
+                    ),
+                  )
+                ],
               ),
             )
-          ],
         ),
-      ),
-    );
+      );
   }
 }
