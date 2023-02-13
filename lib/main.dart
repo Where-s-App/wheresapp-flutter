@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:wheresapp/views/home_page.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:wheresapp/views/login.dart';
 
 import 'api/firebase_options.dart';
 
@@ -9,15 +10,16 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(const MyApp());
+
+  runApp(const ProviderScope(child: MyApp()));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends HookConsumerWidget {
   const MyApp({super.key});
 
   // This widget is the root of your application.
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp(
       title: 'Wheresapp',
       theme: ThemeData(
@@ -37,7 +39,7 @@ class MyApp extends StatelessWidget {
                   color: Colors.black,
                   fontSize: 16,
                   fontWeight: FontWeight.w400))),
-      home: const HomePage(),
+      home: Login(),
     );
   }
 }
