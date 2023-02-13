@@ -47,9 +47,9 @@ class ChatController {
       'users': [username, otherUsername],
       'messages': [
         {
-          'user': username,
+          'author': username,
           'value': 'Hello!',
-          'createdAt': DateTime.now(),
+          'time': DateTime.now(),
         }
       ]
     });

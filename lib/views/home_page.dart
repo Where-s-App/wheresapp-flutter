@@ -4,6 +4,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:wheresapp/api/chat_controller.dart';
 import 'package:wheresapp/models/chat_model.dart';
 import 'package:wheresapp/providers/session_provider.dart';
+import 'package:wheresapp/security/key_generator.dart';
 import 'package:wheresapp/utils/string_extensions.dart';
 import 'package:wheresapp/views/chat.dart';
 import 'package:wheresapp/widgets/chat_card.dart';
@@ -57,6 +58,8 @@ class _HomePageState extends ConsumerState<HomePage> {
     });
   }
 
+  FocusNode _newChatFocusNode = FocusNode();
+
   @override
   Widget build(BuildContext context) {
     String username = ref.read(SessionProvider.session).user.username;
@@ -84,9 +87,27 @@ class _HomePageState extends ConsumerState<HomePage> {
         child: _buildChats(username),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: (() {
-          print('');
-        }),
+        onPressed: () {
+          showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                    title: Text('Start new chat'),
+                    content: TextField(
+                      focusNode: _newChatFocusNode,
+                      decoration: const InputDecoration(
+                        hintText: 'Enter your friend\'s username',
+                      ),
+                      onSubmitted: (username) async {
+                        String key = await KeyGenerator.generateKey();
+                        ChatController.createChat(
+                            ref.read(SessionProvider.session).user.username,
+                            username);
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ));
+          _newChatFocusNode.requestFocus();
+        },
         tooltip: 'New Chat',
         backgroundColor: Theme.of(context).primaryColorDark,
         child: const Icon(Icons.add),
