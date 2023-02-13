@@ -2,16 +2,19 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:wheresapp/models/message_model.dart';
 
 class ChatModel {
-  ChatModel(QuerySnapshot<Object?> snapshot, int index) {
+  ChatModel(QuerySnapshot<Object?> snapshot, int index,
+      {required this.author}) {
     _document = snapshot.docs[index];
   }
 
   late final QueryDocumentSnapshot<Object?> _document;
 
+  String author;
+
   String get id => _document.id;
 
-  dynamic get users => _document['users'].where((element) => element != 'luis');
-  String get name => users.firstWhere((user) => user != 'luis');
+  String get correspondent =>
+      _document['users'].singleWhere((user) => user != author);
 
   late final List<dynamic> _messages = _document['messages'];
 
@@ -20,9 +23,9 @@ class ChatModel {
   List<MessageModel> _getMessages() {
     List<MessageModel> messages = [];
 
-    _messages.forEach((element) {
-      messages.add(MessageModel(element));
-    });
+    for (var message in _messages) {
+      messages.add(MessageModel(message, author));
+    }
 
     return messages;
   }
