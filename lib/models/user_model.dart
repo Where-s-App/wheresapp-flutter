@@ -1,15 +1,16 @@
 class UserModel {
-  final String name;
+  String username;
+  String password;
 
-  const UserModel({
-    required this.name,
-  });
+  UserModel({required this.username, required this.password});
 
   static UserModel fromJson(Map<String, dynamic> json) => UserModel(
-        name: json['name'],
+        username: json['username'],
+        password: json['password'],
       );
 
   Map<String, dynamic> toJson() => {
-        'name': name,
+        'name': username,
+        'password': password,
       };
 }
