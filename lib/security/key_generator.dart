@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:hive/hive.dart';
 import 'package:prime_numbers/prime_numbers.dart';
 
 class KeyGenerator {
@@ -7,8 +8,10 @@ class KeyGenerator {
   late int generator;
   late int result;
 
-  KeyGenerator() {
+  KeyGenerator(String chatId) {
     int privateNumber = Random().nextInt(100);
+
+    Hive.box('keys').put(chatId, {'privateNumber': privateNumber});
 
     primeNumber = PrimeNumbers().generate(100)[Random().nextInt(100)];
 

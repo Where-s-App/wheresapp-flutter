@@ -58,12 +58,9 @@ class ChatController {
       return Future.error('Correspondent does not exist');
     }
 
-    KeyGenerator keyGenerator = KeyGenerator();
+    KeyGenerator keyGenerator = KeyGenerator(chat.id);
 
     return chat.set({
-      'primeNumber': keyGenerator.primeNumber,
-      'generator': keyGenerator.generator,
-      'result': keyGenerator.result,
       'author': author,
       'correspondent': correspondent,
       'users': [author, correspondent],
@@ -74,6 +71,18 @@ class ChatController {
           'time': DateTime.now(),
         }
       ]
+    }).whenComplete(() {
+      final publicKeys =
+          FirebaseFirestore.instance.collection('public-keys').doc();
+
+      publicKeys.set({
+        'chatId': chat.id,
+        'author': {
+          'generator': keyGenerator.generator,
+          'prime': keyGenerator.primeNumber,
+          'result': keyGenerator.result,
+        },
+      });
     });
   }
 
