@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:wheresapp/security/key_generator.dart';
 
 class ChatController {
   static Stream<QuerySnapshot> getChats(String username) {
@@ -40,14 +41,35 @@ class ChatController {
     });
   }
 
-  static Future<void> createChat(String username, String otherUsername) {
+  static Future<void> createChat(String author, String correspondent) async {
     final chat = FirebaseFirestore.instance.collection('chats').doc();
 
+    late bool isValidCorrespondent;
+
+    await FirebaseFirestore.instance
+        .collection('users')
+        .where('username', isEqualTo: correspondent)
+        .get()
+        .then((data) => isValidCorrespondent =
+            data.docs.first.data()['username'] != null &&
+                author != correspondent);
+
+    if (!isValidCorrespondent) {
+      return Future.error('Correspondent does not exist');
+    }
+
+    KeyGenerator keyGenerator = KeyGenerator();
+
     return chat.set({
-      'users': [username, otherUsername],
+      'primeNumber': keyGenerator.primeNumber,
+      'generator': keyGenerator.generator,
+      'result': keyGenerator.result,
+      'author': author,
+      'correspondent': correspondent,
+      'users': [author, correspondent],
       'messages': [
         {
-          'author': username,
+          'author': author,
           'value': 'Hello!',
           'time': DateTime.now(),
         }

@@ -4,7 +4,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:wheresapp/api/chat_controller.dart';
 import 'package:wheresapp/models/chat_model.dart';
 import 'package:wheresapp/providers/session_provider.dart';
-import 'package:wheresapp/security/key_generator.dart';
 import 'package:wheresapp/utils/string_extensions.dart';
 import 'package:wheresapp/views/chat.dart';
 import 'package:wheresapp/widgets/chat_card.dart';
@@ -98,11 +97,20 @@ class _HomePageState extends ConsumerState<HomePage> {
                         hintText: 'Enter your friend\'s username',
                       ),
                       onSubmitted: (username) async {
-                        String key = await KeyGenerator.generateKey();
-                        ChatController.createChat(
-                            ref.read(SessionProvider.session).user.username,
-                            username);
-                        Navigator.of(context).pop();
+                        try {
+                          ChatController.createChat(
+                                  ref
+                                      .read(SessionProvider.session)
+                                      .user
+                                      .username,
+                                  username)
+                              .whenComplete(() => Navigator.of(context).pop());
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content: Text(e.toString()),
+                            duration: Duration(seconds: 2),
+                          ));
+                        }
                       },
                     ),
                   ));
