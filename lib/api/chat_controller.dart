@@ -26,6 +26,33 @@ class ChatController {
     return chatData;
   }
 
+  static Future<void> sendCorrespondentKeys(
+      String chatId, String username) async {
+    final chatPublicKeys = FirebaseFirestore.instance
+        .collection('public-keys')
+        .where('chatId', isEqualTo: chatId);
+
+    await chatPublicKeys.get().then((keys) {
+      bool hasOnlyAuthor = keys.size == 1;
+
+      if (hasOnlyAuthor) {
+        final publicKeyReference =
+            FirebaseFirestore.instance.collection('public-keys');
+
+        KeyGenerator keyGenerator = KeyGenerator(chatId);
+
+        publicKeyReference.add({
+          "correspondent": {
+            "generator": keyGenerator.generator,
+            "prime": keyGenerator.primeNumber,
+            "result": keyGenerator.result,
+          },
+          "chatId": chatId
+        });
+      }
+    });
+  }
+
   static Future<void> sendMessage(
       String chatId, String username, String message) {
     final chat = FirebaseFirestore.instance.collection('chats').doc(chatId);
@@ -82,6 +109,11 @@ class ChatController {
           'prime': keyGenerator.primeNumber,
           'result': keyGenerator.result,
         },
+        'correspondent': {
+          'generator': null,
+          'prime': null,
+          'result': null,
+        }
       });
     });
   }
