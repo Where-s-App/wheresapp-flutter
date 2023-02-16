@@ -1,24 +1,54 @@
+import 'dart:convert';
 import 'dart:math';
 
+import 'package:crypto/crypto.dart';
 import 'package:hive/hive.dart';
 import 'package:prime_numbers/prime_numbers.dart';
 
-class KeyGenerator {
-  late int primeNumber;
-  late int generator;
-  late int result;
+import '../models/public_keys_model.dart';
 
-  KeyGenerator(String chatId) {
+class KeyGenerator {
+  static PublicKeysModel generateAuthorPublicKeys(String chatId) {
     int privateNumber = Random().nextInt(100);
 
-    Hive.box('keys').put(chatId, {'privateNumber': privateNumber});
+    Hive.box('keys').put('$chatId-privateNumber', privateNumber);
 
-    primeNumber = PrimeNumbers().generate(100)[Random().nextInt(100)];
+    final prime = PrimeNumbers().generate(100)[Random().nextInt(100)];
 
-    generator = Random().nextInt(100);
+    final generator = Random().nextInt(100);
 
-    final powerOfPrimeNumber = pow(primeNumber, privateNumber);
+    final powerOfPrimeNumber = pow(prime, privateNumber);
 
-    result = (powerOfPrimeNumber % generator).toInt();
+    final result = (powerOfPrimeNumber % generator).toInt();
+
+    return PublicKeysModel(prime: prime, generator: generator, result: result);
+  }
+
+  static PublicKeysModel generateCorrespondentPublicKeys(
+      String chatId, PublicKeysModel authorPublicKeys) {
+    int privateNumber = Random().nextInt(100);
+
+    Hive.box('keys').put('$chatId-privateNumber', privateNumber);
+
+    final result = (pow(authorPublicKeys.prime, privateNumber) %
+            authorPublicKeys.generator)
+        .toInt();
+
+    return PublicKeysModel(
+        prime: authorPublicKeys.prime,
+        generator: authorPublicKeys.generator,
+        result: result);
+  }
+
+  static void generateSecret(String chatId, PublicKeysModel keys) {
+    final privateNumber = Hive.box('keys').get('$chatId-privateNumber');
+
+    String secret =
+        (pow(keys.result, privateNumber) % keys.generator).toString();
+
+    final secretBytes = utf8.encode(secret);
+    final secretHash = sha256.convert(secretBytes).toString();
+
+    Hive.box('keys').put('$chatId-secret', secretHash);
   }
 }

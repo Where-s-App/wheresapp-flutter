@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:wheresapp/api/chat_controller.dart';
 import 'package:wheresapp/models/chat_model.dart';
@@ -33,6 +34,14 @@ class _HomePageState extends ConsumerState<HomePage> {
           itemCount: data.size,
           itemBuilder: ((context, index) {
             ChatModel chat = ChatModel(data, index, author: username);
+
+            final chatKeys = Hive.box('keys').get('${chat.id}-secret');
+
+            bool chatHasNoSecret = chatKeys == null;
+
+            if (chatHasNoSecret) {
+              ChatController.sendCorrespondentKeys(chat.id, username);
+            }
 
             return GestureDetector(
               onTap: () {

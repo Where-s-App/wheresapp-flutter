@@ -5,12 +5,12 @@ class UserModel {
   UserModel({required this.username, required this.password});
 
   static UserModel fromJson(Map<String, dynamic> json) => UserModel(
-        username: json['username'],
-        password: json['password'],
-      );
+    username: json['username'],
+    password: json['password'],
+  );
 
   Map<String, dynamic> toJson() => {
-        'name': username,
-        'password': password,
-      };
+    'name': username,
+    'password': password,
+  };
 }
