@@ -5,6 +5,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:wheresapp/api/chat_controller.dart';
 import 'package:wheresapp/models/chat_model.dart';
 import 'package:wheresapp/providers/session_provider.dart';
+import 'package:wheresapp/security/key_generator.dart';
 import 'package:wheresapp/utils/string_extensions.dart';
 import 'package:wheresapp/views/chat.dart';
 import 'package:wheresapp/widgets/chat_card.dart';
@@ -40,7 +41,19 @@ class _HomePageState extends ConsumerState<HomePage> {
             bool chatHasNoSecret = chatKeys == null;
 
             if (chatHasNoSecret) {
-              ChatController.sendCorrespondentKeys(chat.id, username);
+              ChatController.isChatValidated(chat.id).then((isChatValidated) {
+                ChatController.isAuthor(chat.id, username).then((isAuthor) {
+                  if (!isChatValidated && !isAuthor) {
+                    ChatController.sendCorrespondentKeys(chat.id, username);
+                  }
+                  if (isChatValidated && isAuthor) {
+                    ChatController.getCorrespondentKeys(chat.id)
+                        .then((correspondentKeys) {
+                      KeyGenerator.generateSecret(chat.id, correspondentKeys);
+                    });
+                  }
+                });
+              });
             }
 
             return GestureDetector(
@@ -50,7 +63,6 @@ class _HomePageState extends ConsumerState<HomePage> {
               },
               child: ChatCard(
                 name: chat.correspondent.capitalize(),
-                lastMessage: chat.lastMessage,
                 time: chat.time,
               ),
             );

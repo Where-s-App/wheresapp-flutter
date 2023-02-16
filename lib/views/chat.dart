@@ -58,8 +58,8 @@ class _ChatState extends ConsumerState<Chat> {
 
     for (var message in messageData) {
       final secret = Hive.box('keys').get('${widget.chat.id}-secret');
-      final decryptedMessage =
-          await FlutterDes.decryptFromHex(message['value'], secret);
+      final text = message['value'];
+      final decryptedMessage = await FlutterDes.decryptFromHex(text, secret);
 
       message['value'] = decryptedMessage;
       messages.add(MessageModel(message, username));
@@ -75,16 +75,15 @@ class _ChatState extends ConsumerState<Chat> {
     return Material(
       child: Scaffold(
             appBar: AppBar(
-              iconTheme:
-                  IconThemeData(color: Theme.of(context).primaryColorDark),
-              title: Text(
-                widget.name,
-                style: TextStyle(
-                    color: Theme.of(context).textTheme.headlineSmall!.color),
-              ),
-              centerTitle: false,
-              backgroundColor: Theme.of(context).backgroundColor,
+              iconTheme: IconThemeData(color: Theme.of(context).primaryColorDark),
+            title: Text(
+              widget.chat.correspondent,
+              style: TextStyle(
+                  color: Theme.of(context).textTheme.headlineSmall!.color),
             ),
+            centerTitle: false,
+            backgroundColor: Theme.of(context).backgroundColor,
+          ),
             body: SizedBox(
               height: MediaQuery.of(context).size.height,
               child: Column(

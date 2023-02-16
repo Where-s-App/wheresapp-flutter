@@ -9,11 +9,11 @@ import '../models/public_keys_model.dart';
 
 class KeyGenerator {
   static PublicKeysModel generateAuthorPublicKeys(String chatId) {
-    int privateNumber = Random().nextInt(100);
+    int privateNumber = Random().nextInt(20);
 
     Hive.box('keys').put('$chatId-privateNumber', privateNumber);
 
-    final prime = PrimeNumbers().generate(100)[Random().nextInt(100)];
+    final prime = PrimeNumbers().generate(20)[Random().nextInt(20)];
 
     final generator = Random().nextInt(100);
 
@@ -26,7 +26,7 @@ class KeyGenerator {
 
   static PublicKeysModel generateCorrespondentPublicKeys(
       String chatId, PublicKeysModel authorPublicKeys) {
-    int privateNumber = Random().nextInt(100);
+    int privateNumber = Random().nextInt(20);
 
     Hive.box('keys').put('$chatId-privateNumber', privateNumber);
 

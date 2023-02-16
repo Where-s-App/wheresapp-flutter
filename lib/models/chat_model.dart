@@ -30,6 +30,6 @@ class ChatModel {
     return messages;
   }
 
-  String get lastMessage => messages.last.value;
-  DateTime get time => messages.last.time;
+  DateTime get time =>
+      messages.isNotEmpty ? messages.last.time : DateTime.now();
 }

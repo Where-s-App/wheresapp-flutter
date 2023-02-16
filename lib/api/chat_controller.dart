@@ -100,17 +100,53 @@ class ChatController {
   static Future<PublicKeysModel> getCorrespondentKeys(String chatId) async {
     final correspondentPublicKeysReference = FirebaseFirestore.instance
         .collection('public-keys')
-        .where('chatId', isEqualTo: chatId)
-        .where('correspondent', isNotEqualTo: null);
+        .where('chatId', isEqualTo: chatId);
 
     late PublicKeysModel correspondentPublicKeys;
 
     await correspondentPublicKeysReference.get().then((keys) {
-      final data = keys.docs.first.data();
-      correspondentPublicKeys = PublicKeysModel.fromJson(data['correspondent']);
+      keys.docs.forEach((key) {
+        if (key.data()['correspondent'] != null) {
+          correspondentPublicKeys =
+              PublicKeysModel.fromJson(key.data()['correspondent']);
+        }
+      });
     });
 
     return correspondentPublicKeys;
+  }
+
+  static Future<bool> isAuthor(String chatId, String username) async {
+    final chatPublicKeys = FirebaseFirestore.instance
+        .collection('public-keys')
+        .where('chatId', isEqualTo: chatId)
+        .where('username', isEqualTo: username);
+
+    late bool isAuthor;
+
+    await chatPublicKeys.get().then((keys) {
+      isAuthor = keys.docs.any((chat) => chat['author'] != null);
+    });
+
+    return isAuthor;
+  }
+
+  static Future<bool> isChatValidated(String chatId) async {
+    final publicKeys = FirebaseFirestore.instance
+        .collection('public-keys')
+        .where('chatId', isEqualTo: chatId);
+
+    late bool valid;
+
+    await publicKeys.get().then((keys) {
+      if (keys.size == 2) {
+        valid = true;
+      } else {
+        valid = false;
+      }
+    });
+
+    return valid;
   }
 
   static Future<void> sendMessage(
@@ -151,13 +187,7 @@ class ChatController {
       'author': username,
       'correspondent': correspondent,
       'users': [username, correspondent],
-      'messages': [
-        {
-          'author': username,
-          'value': 'Hello!',
-          'time': DateTime.now(),
-        }
-      ]
+      'messages': []
     }).whenComplete(() {
       sendAuthorKeys(chat.id, username, publicKeys);
     });

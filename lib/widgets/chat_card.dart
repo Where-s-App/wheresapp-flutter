@@ -4,12 +4,10 @@ class ChatCard extends StatefulWidget {
   const ChatCard(
       {Key? key,
       required this.name,
-      required this.lastMessage,
       required this.time})
       : super(key: key);
 
   final String name;
-  final String lastMessage;
   final DateTime time;
   @override
   _ChatCardState createState() => _ChatCardState();
@@ -49,9 +47,6 @@ class _ChatCardState extends State<ChatCard> {
                       child: Text(widget.name,
                           style: Theme.of(context).textTheme.headlineSmall),
                     ),
-                    Text(widget.lastMessage.length > 50
-                        ? '${widget.lastMessage.substring(0, 40)}...'
-                        : widget.lastMessage)
                   ],
                 ),
               ),
