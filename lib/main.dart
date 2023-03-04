@@ -16,6 +16,8 @@ void main() async {
 
   await Hive.openBox('keys');
 
+  await Hive.openBox('session');
+
   runApp(const ProviderScope(child: MyApp()));
 }
 
