@@ -24,7 +24,7 @@ class ChatModel {
     List<MessageModel> messages = [];
 
     for (var message in _messages) {
-      messages.add(MessageModel(message, author));
+      messages.add(MessageModel(message));
     }
 
     return messages;

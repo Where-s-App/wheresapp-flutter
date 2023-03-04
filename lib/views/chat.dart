@@ -62,7 +62,7 @@ class _ChatState extends ConsumerState<Chat> {
       final decryptedMessage = await FlutterDes.decryptFromHex(text, secret);
 
       message['value'] = decryptedMessage;
-      messages.add(MessageModel(message, username));
+      messages.add(MessageModel(message));
     }
     setState(() {
       _messageEditorController.text = '';
@@ -98,8 +98,7 @@ class _ChatState extends ConsumerState<Chat> {
                       itemCount: widget.messages.length,
                       itemBuilder: (context, index) {
                         MessageModel message = widget.messages[index];
-                        return Message(
-                            message: message.value, type: message.type);
+                        return MessageFactory(messageModel: message).message;
                       },
                     ),
                     ),
