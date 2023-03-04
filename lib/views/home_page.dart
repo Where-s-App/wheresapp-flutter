@@ -8,6 +8,7 @@ import 'package:wheresapp/providers/session_provider.dart';
 import 'package:wheresapp/security/key_generator.dart';
 import 'package:wheresapp/utils/string_extensions.dart';
 import 'package:wheresapp/views/chat.dart';
+import 'package:wheresapp/views/login.dart';
 import 'package:wheresapp/widgets/chat_card.dart';
 
 class HomePage extends ConsumerStatefulWidget {
@@ -78,6 +79,12 @@ class _HomePageState extends ConsumerState<HomePage> {
     });
   }
 
+  _logout(BuildContext context) {
+    Hive.box('session').deleteAll(['username', 'password']);
+    Navigator.of(context)
+        .pushReplacement(MaterialPageRoute(builder: (context) => Login()));
+  }
+
   FocusNode _newChatFocusNode = FocusNode();
 
   @override
@@ -85,7 +92,6 @@ class _HomePageState extends ConsumerState<HomePage> {
     String username = ref.read(SessionProvider.session).user.username;
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      drawer: const Drawer(),
       appBar: AppBar(
         centerTitle: false,
         title: expandedSearchBar ? null : const Text("Where's App"),
@@ -94,13 +100,14 @@ class _HomePageState extends ConsumerState<HomePage> {
                 TextField(
                   decoration: InputDecoration(
                       fillColor: Theme.of(context).backgroundColor),
-            onSubmitted: (search) => _expandSearchBar(),
-          )
-        ]
+                  onSubmitted: (search) => _expandSearchBar(),
+                )
+              ]
             : [
-          IconButton(
-              onPressed: _expandSearchBar, icon: const Icon(Icons.search))
-        ],
+                IconButton(
+                    onPressed: () => _logout(context),
+                    icon: const Icon(Icons.exit_to_app))
+              ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
