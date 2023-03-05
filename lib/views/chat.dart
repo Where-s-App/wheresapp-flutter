@@ -10,12 +10,9 @@ import 'package:wheresapp/widgets/message.dart';
 
 class Chat extends ConsumerStatefulWidget {
   ChatModel chat;
-  late String name;
   late List<MessageModel> messages;
 
   Chat({super.key, required this.chat}) {
-    name = chat.correspondent;
-
     messages = chat.messages;
   }
 
@@ -77,7 +74,7 @@ class _ChatState extends ConsumerState<Chat> {
             appBar: AppBar(
               iconTheme: IconThemeData(color: Theme.of(context).primaryColorDark),
             title: Text(
-              widget.chat.correspondent,
+              widget.chat.correspondents.join(','),
               style: TextStyle(
                   color: Theme.of(context).textTheme.headlineSmall!.color),
             ),

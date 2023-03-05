@@ -6,7 +6,6 @@ import 'package:wheresapp/api/chat_controller.dart';
 import 'package:wheresapp/models/chat_model.dart';
 import 'package:wheresapp/providers/session_provider.dart';
 import 'package:wheresapp/security/key_generator.dart';
-import 'package:wheresapp/utils/string_extensions.dart';
 import 'package:wheresapp/views/chat.dart';
 import 'package:wheresapp/views/login.dart';
 import 'package:wheresapp/widgets/chat_card.dart';
@@ -35,7 +34,7 @@ class _HomePageState extends ConsumerState<HomePage> {
         return ListView.builder(
           itemCount: data.size,
           itemBuilder: ((context, index) {
-            ChatModel chat = ChatModel(data, index, author: username);
+            ChatModel chat = ChatModel(data, index);
 
             final chatKeys = Hive.box('keys').get('${chat.id}-secret');
 
@@ -62,10 +61,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                 Navigator.of(context).push(
                     MaterialPageRoute(builder: (context) => Chat(chat: chat)));
               },
-              child: ChatCard(
-                name: chat.correspondent.capitalize(),
-                time: chat.time,
-              ),
+              child: ChatCard(chatModel: chat),
             );
           }),
         );
