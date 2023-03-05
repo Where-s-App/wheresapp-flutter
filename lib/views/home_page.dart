@@ -114,7 +114,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           showDialog(
               context: context,
               builder: (context) => AlertDialog(
-                    title: Text('Start new chat'),
+                    title: const Text('Start new chat'),
                     content: TextField(
                       focusNode: _newChatFocusNode,
                       decoration: const InputDecoration(
@@ -132,7 +132,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                         } catch (e) {
                           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                             content: Text(e.toString()),
-                            duration: Duration(seconds: 2),
+                            duration: const Duration(seconds: 2),
                           ));
                         }
                       },
