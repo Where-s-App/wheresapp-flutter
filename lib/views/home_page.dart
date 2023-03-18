@@ -18,7 +18,6 @@ class HomePage extends ConsumerStatefulWidget {
 }
 
 class _HomePageState extends ConsumerState<HomePage> {
-  bool expandedSearchBar = false;
 
   Widget _buildChats(String username) {
     return StreamBuilder<QuerySnapshot>(
@@ -49,7 +48,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                   if (isChatValidated && isAuthor) {
                     ChatController.getCorrespondentKeys(chat.id)
                         .then((correspondentKeys) {
-                      KeyGenerator.generateSecret(chat.id, correspondentKeys);
+                        KeyGenerator.generateSecret(chat.id, correspondentKeys);
                     });
                   }
                 });
@@ -69,12 +68,6 @@ class _HomePageState extends ConsumerState<HomePage> {
     );
   }
 
-  _expandSearchBar() {
-    setState(() {
-      expandedSearchBar = !expandedSearchBar;
-    });
-  }
-
   _logout(BuildContext context) {
     Hive.box('session').deleteAll(['username', 'password']);
     Navigator.of(context)
@@ -90,16 +83,8 @@ class _HomePageState extends ConsumerState<HomePage> {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         centerTitle: false,
-        title: expandedSearchBar ? null : const Text("Where's App"),
-        actions: expandedSearchBar
-            ? [
-                TextField(
-                  decoration: InputDecoration(
-                      fillColor: Theme.of(context).backgroundColor),
-                  onSubmitted: (search) => _expandSearchBar(),
-                )
-              ]
-            : [
+        title: const Text("Where's App"),
+        actions: [
                 IconButton(
                     onPressed: () => _logout(context),
                     icon: const Icon(Icons.exit_to_app))
