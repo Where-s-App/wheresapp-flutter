@@ -67,34 +67,12 @@ class _ChatState extends ConsumerState<Chat> {
     });
   }
 
-  _showAddUserDialog(BuildContext context) {
-    showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-              title: Text('Add user'),
-              content: TextField(
-                decoration: const InputDecoration(
-                  hintText: 'Enter your friend\'s username',
-                ),
-                onSubmitted: (username) {
-                  ChatController.addUser(widget.chat.id, username)
-                      .whenComplete(() => Navigator.of(context).pop());
-                },
-              ),
-            ));
-  }
-
   @override
   Widget build(BuildContext context) {
     return Material(
       child: Scaffold(
           appBar: AppBar(
             iconTheme: IconThemeData(color: Theme.of(context).primaryColorDark),
-            actions: [
-              IconButton(
-                  onPressed: () => _showAddUserDialog(context),
-                  icon: const Icon(Icons.add))
-            ],
             title: Text(
               widget.chat.correspondents.join(','),
               style: TextStyle(

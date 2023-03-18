@@ -209,28 +209,6 @@ class ChatController {
     });
   }
 
-  static Future<void> addUser(String chatId, String username) async {
-    final chats = FirebaseFirestore.instance.collection('chats').doc(chatId);
-
-    late bool isValidUser;
-
-    await FirebaseFirestore.instance
-        .collection('users')
-        .where('username', isEqualTo: username)
-        .get()
-        .then((data) {
-      isValidUser = data != null && data.size > 0;
-    });
-
-    if (isValidUser) {
-      return chats.update({
-        'users': FieldValue.arrayUnion([username]),
-      });
-    }
-
-    return;
-  }
-
   static Future<void> deleteChat(String chatId) {
     final chat = FirebaseFirestore.instance.collection('chats').doc(chatId);
 
