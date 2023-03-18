@@ -4,7 +4,6 @@ import 'package:hive/hive.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:wheresapp/api/chat_controller.dart';
 import 'package:wheresapp/models/chat_model.dart';
-import 'package:wheresapp/providers/session_provider.dart';
 import 'package:wheresapp/security/key_generator.dart';
 import 'package:wheresapp/utils/string_extensions.dart';
 import 'package:wheresapp/views/chat.dart';
@@ -19,8 +18,6 @@ class HomePage extends ConsumerStatefulWidget {
 }
 
 class _HomePageState extends ConsumerState<HomePage> {
-  bool expandedSearchBar = false;
-
   Widget _buildChats(String username) {
     return StreamBuilder<QuerySnapshot>(
       stream: ChatController.getChats(username),
@@ -35,7 +32,7 @@ class _HomePageState extends ConsumerState<HomePage> {
         return ListView.builder(
           itemCount: data.size,
           itemBuilder: ((context, index) {
-            ChatModel chat = ChatModel(data, index, author: username);
+            ChatModel chat = ChatModel(data, index);
 
             final chatKeys = Hive.box('keys').get('${chat.id}-secret');
 
@@ -62,21 +59,12 @@ class _HomePageState extends ConsumerState<HomePage> {
                 Navigator.of(context).push(
                     MaterialPageRoute(builder: (context) => Chat(chat: chat)));
               },
-              child: ChatCard(
-                name: chat.correspondent.capitalize(),
-                time: chat.time,
-              ),
+              child: ChatCard(chatModel: chat),
             );
           }),
         );
       },
     );
-  }
-
-  _expandSearchBar() {
-    setState(() {
-      expandedSearchBar = !expandedSearchBar;
-    });
   }
 
   _logout(BuildContext context) {
@@ -89,25 +77,23 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    String username = ref.read(SessionProvider.session).user.username;
+    String username = Hive.box('session').get('username');
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         centerTitle: false,
-        title: expandedSearchBar ? null : const Text("Where's App"),
-        actions: expandedSearchBar
-            ? [
-                TextField(
-                  decoration: InputDecoration(
-                      fillColor: Theme.of(context).backgroundColor),
-                  onSubmitted: (search) => _expandSearchBar(),
-                )
-              ]
-            : [
-                IconButton(
-                    onPressed: () => _logout(context),
-                    icon: const Icon(Icons.exit_to_app))
-              ],
+        title: const Text("Where's App"),
+        actions: [
+          Center(
+            child: Text(
+              username.capitalize(),
+              style: const TextStyle(fontSize: 20),
+            ),
+          ),
+          IconButton(
+              onPressed: () => _logout(context),
+              icon: const Icon(Icons.exit_to_app))
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -118,7 +104,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           showDialog(
               context: context,
               builder: (context) => AlertDialog(
-                    title: Text('Start new chat'),
+                    title: const Text('Start new chat'),
                     content: TextField(
                       focusNode: _newChatFocusNode,
                       decoration: const InputDecoration(
@@ -127,16 +113,12 @@ class _HomePageState extends ConsumerState<HomePage> {
                       onSubmitted: (username) async {
                         try {
                           ChatController.createChat(
-                                  ref
-                                      .read(SessionProvider.session)
-                                      .user
-                                      .username,
-                                  username)
+                                  Hive.box('session').get('username'), username)
                               .whenComplete(() => Navigator.of(context).pop());
                         } catch (e) {
                           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                             content: Text(e.toString()),
-                            duration: Duration(seconds: 2),
+                            duration: const Duration(seconds: 2),
                           ));
                         }
                       },

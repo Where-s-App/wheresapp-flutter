@@ -1,51 +1,95 @@
 import 'package:flutter/material.dart';
+import 'package:wheresapp/models/message_model.dart';
+import 'package:wheresapp/utils/string_extensions.dart';
 
-enum MessageType {
-  fromAuthor,
-  fromCorrespondent,
-}
-
-class Message extends StatefulWidget {
-  const Message({Key? key, required this.message, required this.type})
+class MessageFromAuthor extends StatelessWidget {
+  const MessageFromAuthor({Key? key, required this.messageModel})
       : super(key: key);
 
-  final String message;
-  final MessageType type;
-  @override
-  _MessageState createState() => _MessageState();
-}
+  final MessageModel messageModel;
 
-class _MessageState extends State<Message> {
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Align(
-        alignment: widget.type == MessageType.fromAuthor
-            ? Alignment.topRight
-            : Alignment.topLeft,
+        alignment: Alignment.topRight,
         child: Container(
           decoration: BoxDecoration(
-              color: widget.type == MessageType.fromAuthor
-                  ? Theme.of(context).cardColor
-                  : Theme.of(context).backgroundColor,
-              borderRadius: widget.type == MessageType.fromAuthor
-                  ? const BorderRadius.only(
-                      bottomRight: Radius.circular(8),
-                      bottomLeft: Radius.circular(8),
-                      topLeft: Radius.circular(8))
-                  : const BorderRadius.only(
-                      bottomRight: Radius.circular(8),
-                      bottomLeft: Radius.circular(8),
-                      topRight: Radius.circular(8))),
+              color: Theme.of(context).cardColor,
+              borderRadius: const BorderRadius.only(
+                  bottomRight: Radius.circular(8),
+                  bottomLeft: Radius.circular(8),
+                  topLeft: Radius.circular(8))),
           padding: const EdgeInsets.all(12),
-          child: Text(
-            widget.message,
-            style: Theme.of(context).textTheme.bodyMedium,
-            softWrap: true,
+          child: Column(
+            children: [
+              Text(
+                messageModel.value,
+                style: Theme.of(context).textTheme.bodyMedium,
+                softWrap: true,
+              ),
+            ],
           ),
         ),
       ),
     );
+  }
+}
+
+class MessageFromCorrespondent extends StatelessWidget {
+  const MessageFromCorrespondent({Key? key, required this.messageModel})
+      : super(key: key);
+
+  final MessageModel messageModel;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Align(
+        alignment: Alignment.topLeft,
+        child: Container(
+          decoration: BoxDecoration(
+              color: Theme.of(context).backgroundColor,
+              borderRadius: const BorderRadius.only(
+                  bottomRight: Radius.circular(8),
+                  bottomLeft: Radius.circular(8),
+                  topRight: Radius.circular(8))),
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Text(
+                  messageModel.author.capitalize(),
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+              Text(
+                messageModel.value,
+                style: Theme.of(context).textTheme.bodyMedium,
+                softWrap: true,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class MessageFactory {
+  MessageFactory({required this.messageModel});
+
+  MessageModel messageModel;
+
+  StatelessWidget get message {
+    if (messageModel.type == MessageType.fromAuthor)
+      return MessageFromAuthor(messageModel: messageModel);
+
+    return MessageFromCorrespondent(messageModel: messageModel);
   }
 }

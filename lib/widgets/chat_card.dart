@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 
-class ChatCard extends StatefulWidget {
-  const ChatCard(
-      {Key? key,
-      required this.name,
-      required this.time})
-      : super(key: key);
+import '../models/chat_model.dart';
 
-  final String name;
-  final DateTime time;
+class ChatCard extends StatefulWidget {
+  const ChatCard({Key? key, required this.chatModel}) : super(key: key);
+
+  final ChatModel chatModel;
+
   @override
   _ChatCardState createState() => _ChatCardState();
 }
@@ -44,7 +42,7 @@ class _ChatCardState extends State<ChatCard> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     FittedBox(
-                      child: Text(widget.name,
+                      child: Text(widget.chatModel.correspondents.join(','),
                           style: Theme.of(context).textTheme.headlineSmall),
                     ),
                   ],
@@ -55,7 +53,7 @@ class _ChatCardState extends State<ChatCard> {
                 child: Column(
                   children: [
                     Text(
-                        '${widget.time.hour.toString()}:${widget.time.minute.toString()}'),
+                        '${widget.chatModel.time.hour.toString()}:${widget.chatModel.time.minute.toString()}'),
                   ],
                 ),
               )

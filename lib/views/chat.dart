@@ -5,17 +5,13 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:wheresapp/api/chat_controller.dart';
 import 'package:wheresapp/models/chat_model.dart';
 import 'package:wheresapp/models/message_model.dart';
-import 'package:wheresapp/providers/session_provider.dart';
 import 'package:wheresapp/widgets/message.dart';
 
 class Chat extends ConsumerStatefulWidget {
   ChatModel chat;
-  late String name;
   late List<MessageModel> messages;
 
   Chat({super.key, required this.chat}) {
-    name = chat.correspondent;
-
     messages = chat.messages;
   }
 
@@ -31,12 +27,11 @@ class _ChatState extends ConsumerState<Chat> {
 
   late ScrollController _scrollController;
 
-  late String username;
+  String username = Hive.box('session').get('username');
 
   @override
   void initState() {
     super.initState();
-    username = ref.read(SessionProvider.session).user.username;
 
     _updateChat();
     _scrollController = ScrollController();
@@ -62,7 +57,7 @@ class _ChatState extends ConsumerState<Chat> {
       final decryptedMessage = await FlutterDes.decryptFromHex(text, secret);
 
       message['value'] = decryptedMessage;
-      messages.add(MessageModel(message, username));
+      messages.add(MessageModel(message));
     }
     setState(() {
       _messageEditorController.text = '';
@@ -74,66 +69,61 @@ class _ChatState extends ConsumerState<Chat> {
   Widget build(BuildContext context) {
     return Material(
       child: Scaffold(
-            appBar: AppBar(
-              iconTheme: IconThemeData(color: Theme.of(context).primaryColorDark),
+          appBar: AppBar(
+            iconTheme: IconThemeData(color: Theme.of(context).primaryColorDark),
             title: Text(
-              widget.chat.correspondent,
+              widget.chat.correspondents.join(','),
               style: TextStyle(
                   color: Theme.of(context).textTheme.headlineSmall!.color),
             ),
             centerTitle: false,
             backgroundColor: Theme.of(context).backgroundColor,
           ),
-            body: SizedBox(
-              height: MediaQuery.of(context).size.height,
-              child: Column(
-                children: [
-                  Expanded(
-                    child: SingleChildScrollView(
-                      controller: _scrollController,
-                      child: ListView.builder(
-                        shrinkWrap: true,
+          body: SizedBox(
+            height: MediaQuery.of(context).size.height,
+            child: Column(
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    controller: _scrollController,
+                    child: ListView.builder(
+                      shrinkWrap: true,
                       scrollDirection: Axis.vertical,
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: widget.messages.length,
                       itemBuilder: (context, index) {
                         MessageModel message = widget.messages[index];
-                        return Message(
-                            message: message.value, type: message.type);
+                        return MessageFactory(messageModel: message).message;
                       },
                     ),
-                    ),
                   ),
-                  Container(
-                    height: 70,
-                    color: Theme.of(context).shadowColor,
-                    child: Form(
-                      key: _messageEditorKey,
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: TextFormField(
-                                controller: _messageEditorController,
-                                decoration: InputDecoration(
-                                    labelText: 'Message',
-                                    floatingLabelBehavior:
-                                    FloatingLabelBehavior.never,
-                                    filled: true,
-                                    fillColor: Theme.of(context).cardColor,
-                                    border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                        borderSide: BorderSide.none)),
-                              ),
+                ),
+                Container(
+                  height: 70,
+                  color: Theme.of(context).shadowColor,
+                  child: Form(
+                    key: _messageEditorKey,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: TextFormField(
+                              controller: _messageEditorController,
+                              decoration: InputDecoration(
+                                  labelText: 'Message',
+                                  floatingLabelBehavior:
+                                      FloatingLabelBehavior.never,
+                                  filled: true,
+                                  fillColor: Theme.of(context).cardColor,
+                                  border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                      borderSide: BorderSide.none)),
                             ),
-                            IconButton(
+                          ),
+                          IconButton(
                               onPressed: () async {
                                 if (_messageEditorController.text.isNotEmpty) {
-                                  final username = ref
-                                      .read(SessionProvider.session)
-                                      .user
-                                      .username;
                                   final secret = Hive.box('keys')
                                       .get('${widget.chat.id}-secret')
                                       .toString();
@@ -151,14 +141,13 @@ class _ChatState extends ConsumerState<Chat> {
                               },
                               icon: const Icon(Icons.send))
                         ],
-                        ),
                       ),
                     ),
-                  )
-                ],
-              ),
-            )
-        ),
-      );
+                  ),
+                )
+              ],
+            ),
+          )),
+    );
   }
 }

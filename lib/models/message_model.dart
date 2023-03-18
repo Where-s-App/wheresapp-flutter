@@ -1,10 +1,14 @@
-import 'package:wheresapp/widgets/message.dart';
+import 'package:hive/hive.dart';
+
+enum MessageType {
+  fromAuthor,
+  fromCorrespondent,
+}
 
 class MessageModel {
-  MessageModel(this._message, this._username);
+  MessageModel(this._message);
 
   final Map<String, dynamic> _message;
-  final String _username;
 
   String get value => _message['value'];
 
@@ -12,7 +16,13 @@ class MessageModel {
 
   String get author => _message['author'];
 
-  MessageType get type => author == _username
-      ? MessageType.fromAuthor
-      : MessageType.fromCorrespondent;
+  MessageType get type => _getMessageType();
+
+  MessageType _getMessageType() {
+    final username = Hive.box('session').get('username');
+
+    return username == author
+        ? MessageType.fromAuthor
+        : MessageType.fromCorrespondent;
+  }
 }
