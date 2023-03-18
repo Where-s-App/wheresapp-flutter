@@ -4,8 +4,8 @@ import 'package:hive/hive.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:wheresapp/api/chat_controller.dart';
 import 'package:wheresapp/models/chat_model.dart';
-import 'package:wheresapp/providers/session_provider.dart';
 import 'package:wheresapp/security/key_generator.dart';
+import 'package:wheresapp/utils/string_extensions.dart';
 import 'package:wheresapp/views/chat.dart';
 import 'package:wheresapp/views/login.dart';
 import 'package:wheresapp/widgets/chat_card.dart';
@@ -18,7 +18,6 @@ class HomePage extends ConsumerStatefulWidget {
 }
 
 class _HomePageState extends ConsumerState<HomePage> {
-
   Widget _buildChats(String username) {
     return StreamBuilder<QuerySnapshot>(
       stream: ChatController.getChats(username),
@@ -48,7 +47,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                   if (isChatValidated && isAuthor) {
                     ChatController.getCorrespondentKeys(chat.id)
                         .then((correspondentKeys) {
-                        KeyGenerator.generateSecret(chat.id, correspondentKeys);
+                      KeyGenerator.generateSecret(chat.id, correspondentKeys);
                     });
                   }
                 });
@@ -78,17 +77,23 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    String username = ref.read(SessionProvider.session).user.username;
+    String username = Hive.box('session').get('username');
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         centerTitle: false,
         title: const Text("Where's App"),
         actions: [
-                IconButton(
-                    onPressed: () => _logout(context),
-                    icon: const Icon(Icons.exit_to_app))
-              ],
+          Center(
+            child: Text(
+              username.capitalize(),
+              style: const TextStyle(fontSize: 20),
+            ),
+          ),
+          IconButton(
+              onPressed: () => _logout(context),
+              icon: const Icon(Icons.exit_to_app))
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -108,11 +113,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                       onSubmitted: (username) async {
                         try {
                           ChatController.createChat(
-                                  ref
-                                      .read(SessionProvider.session)
-                                      .user
-                                      .username,
-                                  username)
+                                  Hive.box('session').get('username'), username)
                               .whenComplete(() => Navigator.of(context).pop());
                         } catch (e) {
                           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
