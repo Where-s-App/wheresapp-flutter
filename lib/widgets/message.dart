@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:wheresapp/models/message_model.dart';
-import 'package:wheresapp/utils/string_extensions.dart';
 
 class MessageFromAuthor extends StatelessWidget {
   const MessageFromAuthor({Key? key, required this.messageModel})
@@ -61,13 +60,6 @@ class MessageFromCorrespondent extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: Text(
-                  messageModel.author.capitalize(),
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
               Text(
                 messageModel.value,
                 style: Theme.of(context).textTheme.bodyMedium,

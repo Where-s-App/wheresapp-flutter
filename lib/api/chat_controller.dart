@@ -139,11 +139,7 @@ class ChatController {
     late bool valid;
 
     await publicKeys.get().then((keys) {
-      if (keys.size == 2) {
-        valid = true;
-      } else {
-        valid = false;
-      }
+      valid = keys.size == 2;
     });
 
     return valid;
@@ -153,12 +149,14 @@ class ChatController {
       String chatId, String username, String message) {
     final chat = FirebaseFirestore.instance.collection('chats').doc(chatId);
 
+    final time = DateTime.now();
+
     return chat.update({
       'messages': FieldValue.arrayUnion([
         {
           'author': username,
           'value': message,
-          'time': DateTime.now(),
+          'time': time,
         }
       ])
     });
@@ -199,13 +197,7 @@ class ChatController {
 
     return chat.set({
       'users': [username, otherUsername],
-      'messages': [
-        {
-          'user': username,
-          'value': 'Hello!',
-          'createdAt': DateTime.now(),
-        }
-      ]
+      'messages': []
     });
   }
 
@@ -213,35 +205,5 @@ class ChatController {
     final chat = FirebaseFirestore.instance.collection('chats').doc(chatId);
 
     return chat.delete();
-  }
-
-  static Future<void> updateChat(
-      String chatId, String username, String message) {
-    final chat = FirebaseFirestore.instance.collection('chats').doc(chatId);
-
-    return chat.update({
-      'messages': FieldValue.arrayUnion([
-        {
-          'user': username,
-          'value': message,
-          'createdAt': DateTime.now(),
-        }
-      ])
-    });
-  }
-
-  static Future<void> updateChatWithId(
-      String chatId, String username, String message) {
-    final chat = FirebaseFirestore.instance.collection('chats').doc(chatId);
-
-    return chat.update({
-      'messages': FieldValue.arrayUnion([
-        {
-          'user': username,
-          'value': message,
-          'createdAt': DateTime.now(),
-        }
-      ])
-    });
   }
 }
