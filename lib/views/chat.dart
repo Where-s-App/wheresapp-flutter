@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_des/flutter_des.dart';
 import 'package:hive/hive.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:wheresapp/api/chat_controller.dart';
 import 'package:wheresapp/models/chat_model.dart';
 import 'package:wheresapp/models/message_model.dart';
+import 'package:wheresapp/security/encryptor.dart';
 import 'package:wheresapp/widgets/message.dart';
 
 class Chat extends ConsumerStatefulWidget {
@@ -52,9 +52,8 @@ class _ChatState extends ConsumerState<Chat> {
     List<MessageModel> messages = [];
 
     for (var message in messageData) {
-      final secret = Hive.box('keys').get('${widget.chat.id}-secret');
-      final text = message['value'];
-      final decryptedMessage = await FlutterDes.decryptFromHex(text, secret);
+      MessageEncryptor encryptor = MessageEncryptor(chatId: widget.chat.id);
+      String decryptedMessage = encryptor.decrypt(message['value']);
 
       message['value'] = decryptedMessage;
       messages.add(MessageModel(message));
@@ -63,6 +62,21 @@ class _ChatState extends ConsumerState<Chat> {
       _messageEditorController.text = '';
       widget.messages = messages;
     });
+  }
+
+  _sendMessage() async {
+    if (_messageEditorController.text.isNotEmpty) {
+      MessageEncryptor encryptor = MessageEncryptor(chatId: widget.chat.id);
+
+      String encryptedMessage =
+          encryptor.encrypt(_messageEditorController.text);
+
+      await ChatController.sendMessage(
+              widget.chat.id, username, encryptedMessage)
+          .whenComplete(() {
+        _updateChat();
+      });
+    }
   }
 
   @override
@@ -122,23 +136,7 @@ class _ChatState extends ConsumerState<Chat> {
                             ),
                           ),
                           IconButton(
-                              onPressed: () async {
-                                if (_messageEditorController.text.isNotEmpty) {
-                                  final secret = Hive.box('keys')
-                                      .get('${widget.chat.id}-secret')
-                                      .toString();
-                                  final encryptedMessage =
-                                      await FlutterDes.encryptToHex(
-                                              _messageEditorController.text,
-                                              secret) ??
-                                          '';
-                                  ChatController.sendMessage(widget.chat.id,
-                                          username, encryptedMessage)
-                                      .whenComplete(() {
-                                    _updateChat();
-                                  });
-                                }
-                              },
+                              onPressed: () => _sendMessage(),
                               icon: const Icon(Icons.send))
                         ],
                       ),
