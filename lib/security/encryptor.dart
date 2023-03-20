@@ -1,12 +1,12 @@
 import 'package:encryptor/encryptor.dart';
-import 'package:hive/hive.dart';
+import 'package:wheresapp/data/database.dart';
 
 class MessageEncryptor {
   MessageEncryptor({required this.chatId});
 
   final String chatId;
 
-  String get key => Hive.box('keys').get('$chatId-secret');
+  String get key => Database(chatId: chatId).key;
 
   String encrypt(String message) {
     String encryptedMessage = Encryptor.encrypt(key, message);
@@ -18,12 +18,10 @@ class MessageEncryptor {
     late String decryptedMessage;
 
     try {
-      final secret = Hive.box('keys').get('$chatId-secret');
-
-      if (secret == null) {
-        throw ArgumentError('Secret is null');
+      if (key == '') {
+        throw ArgumentError('No key was found');
       }
-      decryptedMessage = Encryptor.decrypt(secret, message);
+      decryptedMessage = Encryptor.decrypt(key, message);
     } catch (e) {
       decryptedMessage = message;
     }

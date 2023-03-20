@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:hive/hive.dart';
+import 'package:wheresapp/data/database.dart';
 
 import '../models/public_keys_model.dart';
 import '../security/key_generator.dart';
@@ -79,9 +79,8 @@ class KeyController {
             KeyGenerator.generateCorrespondentPublicKeys(
                 chatId, authorPublicKeys);
 
-        final privateNumber = Hive.box('keys').get('$chatId-privateNumber');
-
-        KeyGenerator.generateSecret(chatId, authorPublicKeys, privateNumber);
+        KeyGenerator.generateSecret(
+            chatId, authorPublicKeys, Database(chatId: chatId).privateNumber);
 
         publicKeyReference.add({
           "username": username,
