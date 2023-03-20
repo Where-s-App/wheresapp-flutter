@@ -38,11 +38,11 @@ class ChatController {
     late bool isAuthor;
 
     await chatPublicKeys.get().then((keys) {
-      keys.docs.forEach((chat) {
+      for (var chat in keys.docs) {
         final chatKeys = chat.data();
         isAuthor =
             chatKeys.keys.any((element) => element.toString() == 'author');
-      });
+      }
     });
 
     return isAuthor;

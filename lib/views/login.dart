@@ -12,10 +12,10 @@ class Login extends ConsumerStatefulWidget {
   Login({Key? key}) : super(key: key);
 
   @override
-  _LoginState createState() => _LoginState();
+  LoginState createState() => LoginState();
 }
 
-class _LoginState extends ConsumerState<Login> {
+class LoginState extends ConsumerState<Login> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
@@ -50,7 +50,7 @@ class _LoginState extends ConsumerState<Login> {
           children: [
             Text(
               'Login',
-              style: Theme.of(context).textTheme.headline4,
+              style: Theme.of(context).textTheme.headlineMedium,
             ),
             const SizedBox(height: 20),
             Form(
@@ -87,8 +87,8 @@ class _LoginState extends ConsumerState<Login> {
                             .put('username', _usernameController.text);
                       }
 
-                      Navigator.of(context).pushReplacement(
-                          MaterialPageRoute(builder: (context) => HomePage()));
+                      Navigator.of(context).pushReplacement(MaterialPageRoute(
+                          builder: (context) => const HomePage()));
                     }
                   }
                 },

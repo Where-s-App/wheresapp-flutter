@@ -79,8 +79,9 @@ class MessageFactory {
   MessageModel messageModel;
 
   StatelessWidget get message {
-    if (messageModel.type == MessageType.fromAuthor)
+    if (messageModel.type == MessageType.fromAuthor) {
       return MessageFromAuthor(messageModel: messageModel);
+    }
 
     return MessageFromCorrespondent(messageModel: messageModel);
   }

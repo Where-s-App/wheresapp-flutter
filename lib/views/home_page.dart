@@ -15,10 +15,10 @@ class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
   @override
-  _HomePageState createState() => _HomePageState();
+  HomePageState createState() => HomePageState();
 }
 
-class _HomePageState extends ConsumerState<HomePage> {
+class HomePageState extends ConsumerState<HomePage> {
   Widget _buildChats(String username) {
     return StreamBuilder<QuerySnapshot>(
       stream: ChatController.getChats(username),

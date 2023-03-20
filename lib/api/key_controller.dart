@@ -29,13 +29,13 @@ class KeyController {
     late PublicKeysModel authorPublicKeys;
 
     await authorPublicKeysReference.get().then((keys) {
-      final docs = keys.docs.forEach((element) {
+      for (var element in keys.docs) {
         final author = element.data()['author'];
 
         if (author != null) {
           authorPublicKeys = PublicKeysModel.fromJson(author);
         }
-      });
+      }
     });
 
     return authorPublicKeys;
@@ -49,12 +49,12 @@ class KeyController {
     late PublicKeysModel correspondentPublicKeys;
 
     await correspondentPublicKeysReference.get().then((keys) {
-      keys.docs.forEach((key) {
+      for (var key in keys.docs) {
         if (key.data()['correspondent'] != null) {
           correspondentPublicKeys =
               PublicKeysModel.fromJson(key.data()['correspondent']);
         }
-      });
+      }
     });
 
     return correspondentPublicKeys;

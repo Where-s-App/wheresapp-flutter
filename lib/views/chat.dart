@@ -17,10 +17,10 @@ class Chat extends ConsumerStatefulWidget {
   }
 
   @override
-  _ChatState createState() => _ChatState();
+  ChatState createState() => ChatState();
 }
 
-class _ChatState extends ConsumerState<Chat> {
+class ChatState extends ConsumerState<Chat> {
   final _messageEditorKey = GlobalKey<FormState>();
 
   final TextEditingController _messageEditorController =
