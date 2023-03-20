@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:wheresapp/api/chat_controller.dart';
+import 'package:wheresapp/data/database.dart';
 import 'package:wheresapp/models/chat_model.dart';
 import 'package:wheresapp/models/message_model.dart';
 import 'package:wheresapp/security/encryptor.dart';
@@ -28,7 +28,7 @@ class ChatState extends ConsumerState<Chat> {
 
   late ScrollController _scrollController;
 
-  String username = Hive.box('session').get('username');
+  String username = Database().username;
 
   @override
   void initState() {
@@ -81,12 +81,11 @@ class ChatState extends ConsumerState<Chat> {
   }
 
   _showPrivateNumber(BuildContext context) async {
-    int? privateNumber =
-        Hive.box('keys').get('${widget.chat.id}-privateNumber');
+    int? privateNumber = Database(chatId: widget.chat.id).privateNumber;
 
     showDialog(
         context: context,
-        builder: (context) => privateNumber != null
+        builder: (context) => privateNumber != -1
             ? AlertDialog(
                 icon: const Icon(Icons.key),
                 title: const Text('Private Number'),

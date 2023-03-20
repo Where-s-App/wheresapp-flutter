@@ -2,11 +2,12 @@ import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:wheresapp/api/user_controller.dart';
 import 'package:wheresapp/providers/session_provider.dart';
 import 'package:wheresapp/views/home_page.dart';
+
+import '../data/database.dart';
 
 class Login extends ConsumerStatefulWidget {
   Login({Key? key}) : super(key: key);
@@ -79,12 +80,11 @@ class LoginState extends ConsumerState<Login> {
                     bool loginSuccessful = await handleLogin();
 
                     if (loginSuccessful) {
-                      final cacheUsername = Hive.box('session').get('username');
+                      String cacheUsername = Database().username;
 
-                      if (cacheUsername == null ||
+                      if (cacheUsername.isEmpty ||
                           cacheUsername != _usernameController.text) {
-                        Hive.box('session')
-                            .put('username', _usernameController.text);
+                        Database().username = _usernameController.text;
                       }
 
                       Navigator.of(context).pushReplacement(MaterialPageRoute(

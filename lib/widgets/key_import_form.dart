@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
 import 'package:wheresapp/api/chat_controller.dart';
 import 'package:wheresapp/api/key_controller.dart';
 import 'package:wheresapp/models/public_keys_model.dart';
 import 'package:wheresapp/security/key_generator.dart';
+
+import '../data/database.dart';
 
 class KeyImportForm extends StatelessWidget {
   KeyImportForm({Key? key, required this.chatId}) : super(key: key);
@@ -12,14 +13,14 @@ class KeyImportForm extends StatelessWidget {
   final TextEditingController _textEditingController = TextEditingController();
 
   void importKeys() async {
-    String username = Hive.box('session').get('username');
+    String username = Database().username;
 
     await ChatController.isAuthor(chatId, username).then((isAuthor) async {
       PublicKeysModel keys = isAuthor
           ? await KeyController.getCorrespondentKeys(chatId)
           : await KeyController.getAuthorKeys(chatId);
-      Hive.box('keys')
-          .put('$chatId-privateNumber', int.parse(_textEditingController.text));
+      Database(chatId: chatId).privateNumber =
+          int.parse(_textEditingController.text);
       KeyGenerator.generateSecret(
           chatId, keys, int.parse(_textEditingController.text));
     });
