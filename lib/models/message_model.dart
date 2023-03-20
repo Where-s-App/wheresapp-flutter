@@ -1,4 +1,4 @@
-import 'package:hive/hive.dart';
+import 'package:wheresapp/data/database.dart';
 
 enum MessageType {
   fromAuthor,
@@ -19,7 +19,7 @@ class MessageModel {
   MessageType get type => _getMessageType();
 
   MessageType _getMessageType() {
-    final username = Hive.box('session').get('username');
+    final username = Database().username;
 
     return username == author
         ? MessageType.fromAuthor

@@ -6,6 +6,7 @@ import 'package:wheresapp/views/home_page.dart';
 import 'package:wheresapp/views/login.dart';
 
 import 'api/firebase_options.dart';
+import 'data/database.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,7 +29,7 @@ class MyApp extends HookConsumerWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final cacheUsername = Hive.box('session').get('username');
+    String cacheUsername = Database().username;
 
     return MaterialApp(
       title: 'Wheresapp',
@@ -49,7 +50,7 @@ class MyApp extends HookConsumerWidget {
                   color: Colors.black,
                   fontSize: 16,
                   fontWeight: FontWeight.w400))),
-      home: cacheUsername != null ? const HomePage() : Login(),
+      home: cacheUsername != 'default' ? const HomePage() : Login(),
     );
   }
 }

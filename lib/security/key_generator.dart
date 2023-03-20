@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:crypto/crypto.dart';
-import 'package:hive/hive.dart';
 import 'package:prime_numbers/prime_numbers.dart';
+import 'package:wheresapp/data/database.dart';
 
 import '../models/public_keys_model.dart';
 
@@ -11,7 +11,7 @@ class KeyGenerator {
   static PublicKeysModel generateAuthorPublicKeys(String chatId) {
     int privateNumber = Random().nextInt(20);
 
-    Hive.box('keys').put('$chatId-privateNumber', privateNumber);
+    Database(chatId: chatId).privateNumber = privateNumber;
 
     final prime = PrimeNumbers().generate(20)[Random().nextInt(20)];
 
@@ -28,7 +28,7 @@ class KeyGenerator {
       String chatId, PublicKeysModel authorPublicKeys) {
     int privateNumber = Random().nextInt(20);
 
-    Hive.box('keys').put('$chatId-privateNumber', privateNumber);
+    Database(chatId: chatId).privateNumber = privateNumber;
 
     final result = (pow(authorPublicKeys.prime, privateNumber) %
             authorPublicKeys.generator)
@@ -42,12 +42,11 @@ class KeyGenerator {
 
   static void generateSecret(
       String chatId, PublicKeysModel keys, int privateNumber) {
-    String secret =
-        (pow(keys.result, privateNumber) % keys.generator).toString();
+    String key = (pow(keys.result, privateNumber) % keys.generator).toString();
 
-    final secretBytes = utf8.encode(secret);
-    final secretHash = sha256.convert(secretBytes).toString();
+    final keyBytes = utf8.encode(key);
+    final keyHash = sha256.convert(keyBytes).toString();
 
-    Hive.box('keys').put('$chatId-secret', secretHash);
+    Database(chatId: chatId).key = keyHash;
   }
 }

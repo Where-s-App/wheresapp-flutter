@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:hive/hive.dart';
+import 'package:wheresapp/data/database.dart';
 import 'package:wheresapp/models/message_model.dart';
 import 'package:wheresapp/utils/string_extensions.dart';
 
@@ -19,7 +19,7 @@ class ChatModel {
 
   List<String> _getCorrespondents() {
     List<String> correspondents = [];
-    String username = Hive.box('session').get('username');
+    String username = Database(chatId: id).username;
 
     List<dynamic> users = _document['users'];
 

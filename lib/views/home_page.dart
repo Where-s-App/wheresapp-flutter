@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:wheresapp/api/chat_controller.dart';
 import 'package:wheresapp/api/key_controller.dart';
+import 'package:wheresapp/data/database.dart';
 import 'package:wheresapp/models/chat_model.dart';
 import 'package:wheresapp/security/key_generator.dart';
 import 'package:wheresapp/utils/string_extensions.dart';
@@ -35,11 +35,9 @@ class HomePageState extends ConsumerState<HomePage> {
           itemBuilder: ((context, index) {
             ChatModel chat = ChatModel(data, index);
 
-            String? chatKeys = Hive.box('keys').get('${chat.id}-secret');
+            String key = Database(chatId: chat.id).key;
 
-            bool chatHasNoSecret = chatKeys == null;
-
-            if (chatHasNoSecret) {
+            if (key.isEmpty) {
               ChatController.isChatValidated(chat.id).then((isChatValidated) {
                 ChatController.isAuthor(chat.id, username).then((isAuthor) {
                   if (!isChatValidated && !isAuthor) {
@@ -49,7 +47,8 @@ class HomePageState extends ConsumerState<HomePage> {
                     KeyController.getCorrespondentKeys(chat.id)
                         .then((correspondentKeys) {
                       final privateNumber =
-                          Hive.box('keys').get('${chat.id}-privateNumber');
+                          Database(chatId: chat.id).privateNumber;
+
                       KeyGenerator.generateSecret(
                           chat.id, correspondentKeys, privateNumber);
                     });
@@ -72,7 +71,7 @@ class HomePageState extends ConsumerState<HomePage> {
   }
 
   _logout(BuildContext context) {
-    Hive.box('session').deleteAll(['username', 'password']);
+    Database().deleteCredentials();
     Navigator.of(context)
         .pushReplacement(MaterialPageRoute(builder: (context) => Login()));
   }
@@ -81,7 +80,7 @@ class HomePageState extends ConsumerState<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    String username = Hive.box('session').get('username');
+    String username = Database().username;
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
@@ -117,7 +116,7 @@ class HomePageState extends ConsumerState<HomePage> {
                       onSubmitted: (username) async {
                         try {
                           ChatController.createChat(
-                                  Hive.box('session').get('username'), username)
+                                  Database().username, username)
                               .whenComplete(() => Navigator.of(context).pop());
                         } catch (e) {
                           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
