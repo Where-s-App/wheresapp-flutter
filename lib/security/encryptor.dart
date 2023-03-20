@@ -6,7 +6,7 @@ class MessageEncryptor {
 
   final String chatId;
 
-  String get key => Hive.box('keys').get('$chatId-secret').toString();
+  String get key => Hive.box('keys').get('$chatId-secret');
 
   String encrypt(String message) {
     String encryptedMessage = Encryptor.encrypt(key, message);
@@ -15,7 +15,18 @@ class MessageEncryptor {
   }
 
   String decrypt(String message) {
-    String decryptedMessage = Encryptor.decrypt(key, message);
+    late String decryptedMessage;
+
+    try {
+      final secret = Hive.box('keys').get('$chatId-secret');
+
+      if (secret == null) {
+        throw ArgumentError('Secret is null');
+      }
+      decryptedMessage = Encryptor.decrypt(secret, message);
+    } catch (e) {
+      decryptedMessage = message;
+    }
 
     return decryptedMessage;
   }
