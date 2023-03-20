@@ -4,7 +4,6 @@ import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:wheresapp/api/user_controller.dart';
-import 'package:wheresapp/providers/session_provider.dart';
 import 'package:wheresapp/views/home_page.dart';
 
 import '../data/database.dart';
@@ -27,12 +26,7 @@ class LoginState extends ConsumerState<Login> {
       final passwordBytes = utf8.encode(_passwordController.text);
       final passwordHash = sha256.convert(passwordBytes).toString();
 
-      if (userData.password == passwordHash) {
-        status = true;
-        ref.watch(SessionProvider.session).user = userData;
-      } else {
-        status = false;
-      }
+      status = userData.password == passwordHash;
     });
     return status;
   }
