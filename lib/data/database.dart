@@ -1,3 +1,4 @@
+import 'package:encryptor/encryptor.dart';
 import 'package:hive/hive.dart';
 
 class Database {
@@ -13,15 +14,38 @@ class Database {
 
   Box keyBox = Hive.box('keys');
 
-  int get privateNumber =>
-      keyBox.get('$username-$chatId-privateNumber', defaultValue: -1);
+  int get privateNumber => _getEncryptedPrivateNumber();
 
-  set privateNumber(int number) =>
-      keyBox.put('$username-$chatId-privateNumber', number);
+  int _getEncryptedPrivateNumber() {
+    String encryptedPrivateNumber =
+        keyBox.get('$username-$chatId-privateNumber', defaultValue: '');
 
-  String get key => keyBox.get('$username-$chatId-key', defaultValue: '');
+    if (encryptedPrivateNumber == '') return -1;
 
-  set key(String key) => keyBox.put('$username-$chatId-key', key);
+    String decryptedPrivateNumber =
+        Encryptor.decrypt(username, encryptedPrivateNumber);
+
+    int parsedPrivateNumber = int.parse(decryptedPrivateNumber, radix: 16);
+
+    return parsedPrivateNumber;
+  }
+
+  set privateNumber(int number) => keyBox.put('$username-$chatId-privateNumber',
+      Encryptor.encrypt(username, number.toRadixString(16)));
+
+  String get key => _getEncryptedKey();
+
+  String _getEncryptedKey() {
+    String encryptedKey = keyBox.get('$username-$chatId-key', defaultValue: '');
+
+    if (encryptedKey == '') return '';
+    String decriptedKey = Encryptor.decrypt(username, encryptedKey);
+
+    return decriptedKey;
+  }
+
+  set key(String key) =>
+      keyBox.put('$username-$chatId-key', Encryptor.encrypt(username, key));
 
   void deleteCredentials() {
     sessionBox.delete('username');
