@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:wheresapp/models/public_keys_model.dart';
 import 'package:wheresapp/security/key_generator.dart';
 
-import 'keys_controller.dart';
+import 'key_controller.dart';
 
 class ChatController {
   static Stream<QuerySnapshot> getChats(String username) {
@@ -38,7 +38,11 @@ class ChatController {
     late bool isAuthor;
 
     await chatPublicKeys.get().then((keys) {
-      isAuthor = keys.docs.any((chat) => chat['author'] != null);
+      keys.docs.forEach((chat) {
+        final chatKeys = chat.data();
+        isAuthor =
+            chatKeys.keys.any((element) => element.toString() == 'author');
+      });
     });
 
     return isAuthor;
@@ -100,7 +104,7 @@ class ChatController {
       'users': [username, correspondent],
       'messages': []
     }).whenComplete(() {
-      KeysController.sendAuthorKeys(chat.id, username, publicKeys);
+      KeyController.sendAuthorKeys(chat.id, username, publicKeys);
     });
   }
 
