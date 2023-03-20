@@ -5,6 +5,7 @@ import 'package:wheresapp/api/chat_controller.dart';
 import 'package:wheresapp/models/chat_model.dart';
 import 'package:wheresapp/models/message_model.dart';
 import 'package:wheresapp/security/encryptor.dart';
+import 'package:wheresapp/widgets/key_import_form.dart';
 import 'package:wheresapp/widgets/message.dart';
 
 class Chat extends ConsumerStatefulWidget {
@@ -79,6 +80,28 @@ class _ChatState extends ConsumerState<Chat> {
     }
   }
 
+  _showPrivateNumber(BuildContext context) async {
+    int? privateNumber =
+        Hive.box('keys').get('${widget.chat.id}-privateNumber');
+
+    showDialog(
+        context: context,
+        builder: (context) => privateNumber != null
+            ? AlertDialog(
+                icon: const Icon(Icons.key),
+                title: const Text('Private Number'),
+                content: Text(
+                  '$privateNumber',
+                  textAlign: TextAlign.center,
+                ),
+              )
+            : AlertDialog(
+                icon: const Icon(Icons.key),
+                title: const Text('Import Private Number'),
+                content: KeyImportForm(chatId: widget.chat.id),
+              ));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -90,6 +113,11 @@ class _ChatState extends ConsumerState<Chat> {
               style: TextStyle(
                   color: Theme.of(context).textTheme.headlineSmall!.color),
             ),
+            actions: [
+              IconButton(
+                  onPressed: () => _showPrivateNumber(context),
+                  icon: const Icon(Icons.key))
+            ],
             centerTitle: false,
             backgroundColor: Theme.of(context).backgroundColor,
           ),
