@@ -40,9 +40,8 @@ class KeyGenerator {
         result: result);
   }
 
-  static void generateSecret(String chatId, PublicKeysModel keys) {
-    final privateNumber = Hive.box('keys').get('$chatId-privateNumber');
-
+  static void generateSecret(
+      String chatId, PublicKeysModel keys, int privateNumber) {
     String secret =
         (pow(keys.result, privateNumber) % keys.generator).toString();
 

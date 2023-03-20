@@ -8,10 +8,10 @@ class ChatCard extends StatefulWidget {
   final ChatModel chatModel;
 
   @override
-  _ChatCardState createState() => _ChatCardState();
+  ChatCardState createState() => ChatCardState();
 }
 
-class _ChatCardState extends State<ChatCard> {
+class ChatCardState extends State<ChatCard> {
   double height = 80;
 
   @override
