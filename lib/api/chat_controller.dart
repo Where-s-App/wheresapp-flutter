@@ -4,6 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:wheresapp/models/public_keys_model.dart';
 import 'package:wheresapp/security/key_generator.dart';
 
+import 'key_controller.dart';
+
 class ChatController {
   static Stream<QuerySnapshot> getChats(String username) {
     final chats = FirebaseFirestore.instance
@@ -27,95 +29,6 @@ class ChatController {
     return chatData;
   }
 
-  static Future<void> sendCorrespondentKeys(
-      String chatId, String username) async {
-    final chatPublicKeys = FirebaseFirestore.instance
-        .collection('public-keys')
-        .where('chatId', isEqualTo: chatId);
-
-    await chatPublicKeys.get().then((keys) async {
-      bool hasOnlyAuthor = keys.size == 1;
-
-      if (hasOnlyAuthor) {
-        final publicKeyReference =
-            FirebaseFirestore.instance.collection('public-keys');
-
-        PublicKeysModel authorPublicKeys = await getAuthorKeys(chatId);
-
-        PublicKeysModel publicKeys =
-            KeyGenerator.generateCorrespondentPublicKeys(
-                chatId, authorPublicKeys);
-
-        KeyGenerator.generateSecret(chatId, authorPublicKeys);
-
-        publicKeyReference.add({
-          "username": username,
-          "correspondent": {
-            "generator": publicKeys.generator,
-            "prime": publicKeys.prime,
-            "result": publicKeys.result,
-          },
-          "chatId": chatId
-        });
-      }
-    });
-  }
-
-  static Future<void> sendAuthorKeys(
-      String chatId, String username, PublicKeysModel publicKeys) async {
-    final publicKeysReference =
-        FirebaseFirestore.instance.collection('public-keys').doc();
-
-    publicKeysReference.set({
-      'chatId': chatId,
-      'username': username,
-      'author': {
-        'generator': publicKeys.generator,
-        'prime': publicKeys.prime,
-        'result': publicKeys.result,
-      },
-    });
-  }
-
-  static Future<PublicKeysModel> getAuthorKeys(String chatId) async {
-    final authorPublicKeysReference = FirebaseFirestore.instance
-        .collection('public-keys')
-        .where('chatId', isEqualTo: chatId);
-
-    late PublicKeysModel authorPublicKeys;
-
-    await authorPublicKeysReference.get().then((keys) {
-      final docs = keys.docs.forEach((element) {
-        final author = element.data()['author'];
-
-        if (author != null) {
-          authorPublicKeys = PublicKeysModel.fromJson(author);
-        }
-      });
-    });
-
-    return authorPublicKeys;
-  }
-
-  static Future<PublicKeysModel> getCorrespondentKeys(String chatId) async {
-    final correspondentPublicKeysReference = FirebaseFirestore.instance
-        .collection('public-keys')
-        .where('chatId', isEqualTo: chatId);
-
-    late PublicKeysModel correspondentPublicKeys;
-
-    await correspondentPublicKeysReference.get().then((keys) {
-      keys.docs.forEach((key) {
-        if (key.data()['correspondent'] != null) {
-          correspondentPublicKeys =
-              PublicKeysModel.fromJson(key.data()['correspondent']);
-        }
-      });
-    });
-
-    return correspondentPublicKeys;
-  }
-
   static Future<bool> isAuthor(String chatId, String username) async {
     final chatPublicKeys = FirebaseFirestore.instance
         .collection('public-keys')
@@ -125,7 +38,11 @@ class ChatController {
     late bool isAuthor;
 
     await chatPublicKeys.get().then((keys) {
-      isAuthor = keys.docs.any((chat) => chat['author'] != null);
+      keys.docs.forEach((chat) {
+        final chatKeys = chat.data();
+        isAuthor =
+            chatKeys.keys.any((element) => element.toString() == 'author');
+      });
     });
 
     return isAuthor;
@@ -187,7 +104,7 @@ class ChatController {
       'users': [username, correspondent],
       'messages': []
     }).whenComplete(() {
-      sendAuthorKeys(chat.id, username, publicKeys);
+      KeyController.sendAuthorKeys(chat.id, username, publicKeys);
     });
   }
 

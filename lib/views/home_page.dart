@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:wheresapp/api/chat_controller.dart';
+import 'package:wheresapp/api/key_controller.dart';
 import 'package:wheresapp/models/chat_model.dart';
 import 'package:wheresapp/security/key_generator.dart';
 import 'package:wheresapp/utils/string_extensions.dart';
@@ -34,7 +35,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           itemBuilder: ((context, index) {
             ChatModel chat = ChatModel(data, index);
 
-            final chatKeys = Hive.box('keys').get('${chat.id}-secret');
+            String? chatKeys = Hive.box('keys').get('${chat.id}-secret');
 
             bool chatHasNoSecret = chatKeys == null;
 
@@ -42,12 +43,15 @@ class _HomePageState extends ConsumerState<HomePage> {
               ChatController.isChatValidated(chat.id).then((isChatValidated) {
                 ChatController.isAuthor(chat.id, username).then((isAuthor) {
                   if (!isChatValidated && !isAuthor) {
-                    ChatController.sendCorrespondentKeys(chat.id, username);
+                    KeyController.sendCorrespondentKeys(chat.id, username);
                   }
                   if (isChatValidated && isAuthor) {
-                    ChatController.getCorrespondentKeys(chat.id)
+                    KeyController.getCorrespondentKeys(chat.id)
                         .then((correspondentKeys) {
-                      KeyGenerator.generateSecret(chat.id, correspondentKeys);
+                      final privateNumber =
+                          Hive.box('keys').get('${chat.id}-privateNumber');
+                      KeyGenerator.generateSecret(
+                          chat.id, correspondentKeys, privateNumber);
                     });
                   }
                 });
@@ -73,7 +77,7 @@ class _HomePageState extends ConsumerState<HomePage> {
         .pushReplacement(MaterialPageRoute(builder: (context) => Login()));
   }
 
-  FocusNode _newChatFocusNode = FocusNode();
+  final FocusNode _newChatFocusNode = FocusNode();
 
   @override
   Widget build(BuildContext context) {
