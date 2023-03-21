@@ -47,6 +47,11 @@ class Database {
   set key(String key) =>
       keyBox.put('$username-$chatId-key', Encryptor.encrypt(username, key));
 
+  void deletePrivateKeys() {
+    Hive.box('keys').delete('$username-$chatId-key');
+    Hive.box('keys').delete('$username-$chatId-privateNumber');
+  }
+
   void deleteCredentials() {
     sessionBox.delete('username');
   }
