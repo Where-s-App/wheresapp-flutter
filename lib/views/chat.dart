@@ -80,8 +80,14 @@ class ChatState extends ConsumerState<Chat> {
     }
   }
 
+  _editPrivateNumber(BuildContext context) {
+    Database(chatId: widget.chat.id).privateNumber = -1;
+    Navigator.of(context).pop();
+    _showPrivateNumber(context);
+  }
+
   _showPrivateNumber(BuildContext context) async {
-    int? privateNumber = Database(chatId: widget.chat.id).privateNumber;
+    int privateNumber = Database(chatId: widget.chat.id).privateNumber;
 
     showDialog(
         context: context,
@@ -89,10 +95,16 @@ class ChatState extends ConsumerState<Chat> {
             ? AlertDialog(
                 icon: const Icon(Icons.key),
                 title: const Text('Private Number'),
-                content: Text(
-                  '$privateNumber',
-                  textAlign: TextAlign.center,
-                ),
+                content:
+                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                  Text(
+                    '$privateNumber',
+                    textAlign: TextAlign.center,
+                  ),
+                  IconButton(
+                      onPressed: () => _editPrivateNumber(context),
+                      icon: const Icon(Icons.edit))
+                ]),
               )
             : AlertDialog(
                 icon: const Icon(Icons.key),
