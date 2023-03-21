@@ -19,6 +19,27 @@ class HomePage extends ConsumerStatefulWidget {
 }
 
 class HomePageState extends ConsumerState<HomePage> {
+  _showDeleteChatDialog(String chatId) {
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              icon: const Icon(Icons.delete),
+              title: const Text('Delete chat?'),
+              content: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: const Text('Cancel')),
+                  ElevatedButton(
+                      onPressed: () => ChatController.deleteChat(chatId)
+                          .whenComplete(() => Navigator.of(context).pop()),
+                      child: const Text('Delete'))
+                ],
+              ),
+            ));
+  }
+
   Widget _buildChats(String username) {
     return StreamBuilder<QuerySnapshot>(
       stream: ChatController.getChats(username),
@@ -62,6 +83,7 @@ class HomePageState extends ConsumerState<HomePage> {
                 Navigator.of(context).push(
                     MaterialPageRoute(builder: (context) => Chat(chat: chat)));
               },
+              onLongPress: () => _showDeleteChatDialog(chat.id),
               child: ChatCard(chatModel: chat),
             );
           }),

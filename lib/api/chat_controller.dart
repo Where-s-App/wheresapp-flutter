@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:wheresapp/data/database.dart';
 import 'package:wheresapp/models/public_keys_model.dart';
 import 'package:wheresapp/security/key_generator.dart';
 
@@ -118,9 +119,20 @@ class ChatController {
     });
   }
 
-  static Future<void> deleteChat(String chatId) {
+  static Future<void> deleteChat(String chatId) async {
     final chat = FirebaseFirestore.instance.collection('chats').doc(chatId);
 
-    return chat.delete();
+    chat.delete();
+
+    final publicKeys = await FirebaseFirestore.instance
+        .collection('public-keys')
+        .where('chatId', isEqualTo: chatId)
+        .get();
+
+    for (var key in publicKeys.docs) {
+      FirebaseFirestore.instance.collection('public-keys').doc(key.id).delete();
+    }
+
+    Database(chatId: chatId).deletePrivateKeys();
   }
 }
