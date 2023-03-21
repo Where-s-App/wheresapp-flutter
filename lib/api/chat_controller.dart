@@ -33,16 +33,17 @@ class ChatController {
   static Future<bool> isAuthor(String chatId, String username) async {
     final chatPublicKeys = FirebaseFirestore.instance
         .collection('public-keys')
-        .where('chatId', isEqualTo: chatId)
-        .where('username', isEqualTo: username);
+        .where('chatId', isEqualTo: chatId);
 
     late bool isAuthor;
 
     await chatPublicKeys.get().then((keys) {
-      for (var chat in keys.docs) {
+      final document = keys.docs;
+      for (var chat in document) {
         final chatKeys = chat.data();
-        isAuthor =
-            chatKeys.keys.any((element) => element.toString() == 'author');
+        final identifiers = chatKeys.keys;
+        isAuthor = identifiers.any((element) =>
+            element == 'author' && chatKeys['username'] == username);
       }
     });
 
